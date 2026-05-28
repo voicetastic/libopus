@@ -1,0 +1,44 @@
+[package]
+name = "libopus-src"
+# Matches the upstream libopus release we vendor (1.5.2, Apr 2024 —
+# the latest stable from Xiph). If we apply local changes on top of
+# the emcc build glue we bump with semver build metadata
+# (e.g. `1.5.2+vt.1`).
+version = "1.5.2"
+edition = "2024"
+rust-version = "1.95"
+license = "BSD-3-Clause"
+description = "Vendored libopus (BSD-3-Clause, by Xiph.Org / Skype Limited / Broadcom / Octasic / Jean-Marc Valin) compiled to a standalone WebAssembly artifact via Emscripten. Built in FIXED_POINT mode (no float-only DSP, no analysis, no DNN). Source under `vendor/` is unmodified upstream — see `vendor/COPYING`. Native (non-wasm32) builds are a no-op."
+repository = "https://git.cha-sam.re/voicetastic/libopus-src"
+homepage = "https://git.cha-sam.re/voicetastic/libopus-src"
+documentation = "https://docs.rs/libopus-src"
+readme = "README.md"
+keywords = ["opus", "codec", "audio", "wasm", "emscripten"]
+categories = ["multimedia::audio", "wasm", "external-ffi-bindings"]
+# Explicit allowlist so `cargo package` produces a minimal, reproducible
+# archive — covers the build glue, the C sources we actually compile,
+# their headers, and the Makefile.am-style sources lists (we read these
+# at build time for the canonical file lists).
+include = [
+    "src/**/*.rs",
+    "build.rs",
+    "Cargo.toml",
+    "README.md",
+    "LICENSE",
+    "vendor/**/*.c",
+    "vendor/**/*.h",
+    "vendor/*_sources.mk",
+    "vendor/COPYING",
+    "vendor/AUTHORS",
+    "vendor/README",
+]
+
+# No public API for native consumers — the desktop / Android path keeps
+# its existing `audiopus` (system libopus FFI) link. This crate exists
+# to host the wasm build artifact, exposed via `wasm_module_bytes()` on
+# wasm32. Native builds are a no-op (build.rs returns early).
+[lib]
+path = "src/lib.rs"
+
+[package.metadata.docs.rs]
+targets = ["wasm32-unknown-unknown"]
