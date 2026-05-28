@@ -5,6 +5,17 @@ name = "libopus"
 # the emcc build glue we bump with semver build metadata
 # (e.g. `1.5.2+vt.1`).
 version = "1.5.2"
+# Upstream copyright holders (per vendor/AUTHORS + vendor/COPYING) plus the
+# packager of this wasm-build wrapper. Bug reports about the build glue
+# go to the latter; upstream codec issues belong on the Xiph tracker.
+authors = [
+    "Xiph.Org Foundation",
+    "Skype Limited",
+    "Octasic",
+    "Broadcom",
+    "Jean-Marc Valin",
+    "acarteron <acarteron@cha-sam.re>",
+]
 edition = "2024"
 rust-version = "1.95"
 license = "BSD-3-Clause"
