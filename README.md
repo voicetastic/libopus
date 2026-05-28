@@ -1,13 +1,13 @@
-# libopus-src
+# libopus
 
-[![crates.io](https://img.shields.io/crates/v/libopus-src.svg)](https://crates.io/crates/libopus-src)
-[![docs.rs](https://docs.rs/libopus-src/badge.svg)](https://docs.rs/libopus-src)
+[![crates.io](https://img.shields.io/crates/v/libopus.svg)](https://crates.io/crates/libopus)
+[![docs.rs](https://docs.rs/libopus/badge.svg)](https://docs.rs/libopus)
 
 Vendored [libopus](https://opus-codec.org/) (BSD-3-Clause, by Xiph.Org /
 Skype Limited / Broadcom / Octasic / Jean-Marc Valin and contributors)
 compiled to a standalone WebAssembly artifact via
 [Emscripten](https://emscripten.org/). Originally written for
-[Voicetastic](https://git.cha-sam.re/voicetastic)'s browser client, but
+[Voicetastic](https://github.com/voicetastic)'s browser client, but
 useful for any Rust + wasm project that needs Opus encode/decode without
 depending on the browser's `WebCodecs.AudioEncoder`.
 
@@ -40,7 +40,7 @@ with semver build metadata (e.g. `1.5.2+vt.1`).
 
 ```toml
 [dependencies]
-libopus-src = "1.5"
+libopus = "1.5"
 ```
 
 ```rust
@@ -49,7 +49,7 @@ libopus-src = "1.5"
 // (`emscripten_notify_memory_growth`); see voicetastic-core's
 // `codec/opus_shim.js` for a working example.
 #[cfg(target_arch = "wasm32")]
-let bytes: &'static [u8] = libopus_src::wasm_module_bytes();
+let bytes: &'static [u8] = libopus::wasm_module_bytes();
 ```
 
 ## Build requirements

@@ -21,7 +21,7 @@ fn main() {
 
     if Command::new("emcc").arg("--version").output().is_err() {
         panic!(
-            "libopus-src: building for wasm32 but `emcc` (emscripten) is \
+            "libopus: building for wasm32 but `emcc` (emscripten) is \
              not in PATH. Install it (`pacman -S emscripten` on Arch) and \
              source its profile (`source /etc/profile.d/emscripten.sh`)."
         );
@@ -36,14 +36,7 @@ fn main() {
     println!("cargo:rerun-if-changed=glue");
 
     // Include paths mirror upstream's autotools build.
-    let inc = [
-        "include",
-        "celt",
-        "silk",
-        "silk/fixed",
-        "src",
-        "",
-    ];
+    let inc = ["include", "celt", "silk", "silk/fixed", "src", ""];
     let inc_args: Vec<String> = inc
         .iter()
         .map(|p| format!("-I{}", vendor.join(p).display()))

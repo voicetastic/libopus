@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "libopus-src"
+name = "libopus"
 version = "1.5.2"

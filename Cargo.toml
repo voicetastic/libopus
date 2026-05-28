@@ -1,5 +1,5 @@
 [package]
-name = "libopus-src"
+name = "libopus"
 # Matches the upstream libopus release we vendor (1.5.2, Apr 2024 —
 # the latest stable from Xiph). If we apply local changes on top of
 # the emcc build glue we bump with semver build metadata
@@ -9,9 +9,9 @@ edition = "2024"
 rust-version = "1.95"
 license = "BSD-3-Clause"
 description = "Vendored libopus (BSD-3-Clause, by Xiph.Org / Skype Limited / Broadcom / Octasic / Jean-Marc Valin) compiled to a standalone WebAssembly artifact via Emscripten. Built in FIXED_POINT mode (no float-only DSP, no analysis, no DNN). Includes thin non-variadic wrappers around opus_*_ctl (under `glue/`, BSD-3-Clause) so JS callers can dispatch the ctl operations across the wasm boundary — emscripten's STANDALONE_WASM doesn't pass variadic args from JS. Source under `vendor/` is unmodified upstream — see `vendor/COPYING`. Native (non-wasm32) builds are a no-op."
-repository = "https://git.cha-sam.re/voicetastic/libopus-src"
-homepage = "https://git.cha-sam.re/voicetastic/libopus-src"
-documentation = "https://docs.rs/libopus-src"
+repository = "https://github.com/voicetastic/libopus"
+homepage = "https://github.com/voicetastic/libopus"
+documentation = "https://docs.rs/libopus"
 readme = "README.md"
 keywords = ["opus", "codec", "audio", "wasm", "emscripten"]
 categories = ["multimedia::audio", "wasm", "external-ffi-bindings"]
