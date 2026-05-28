@@ -29,9 +29,11 @@ fn main() {
 
     let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let vendor = manifest.join("vendor");
+    let glue = manifest.join("glue");
     let out_dir = PathBuf::from(std::env::var_os("OUT_DIR").unwrap());
     let obj_dir = out_dir.join("opus_obj");
     std::fs::create_dir_all(&obj_dir).unwrap();
+    println!("cargo:rerun-if-changed=glue");
 
     // Include paths mirror upstream's autotools build.
     let inc = [
@@ -94,16 +96,27 @@ fn main() {
             sources.push(p);
         }
     }
+    // Our own non-variadic wrappers (see glue/helpers.c) — emscripten can't
+    // dispatch variadic args from JS in STANDALONE_WASM mode.
+    for entry in std::fs::read_dir(&glue).expect("read glue dir") {
+        let p = entry.unwrap().path();
+        if p.extension().and_then(|e| e.to_str()) == Some("c") {
+            sources.push(p);
+        }
+    }
 
     // Compile each .c separately. -O2 keeps the wasm small without paying
     // the LTO cost; emcc's link step does its own dead-code elimination.
     let mut objects: Vec<PathBuf> = Vec::with_capacity(sources.len());
     for src in &sources {
-        // Use the .c file's parent dir as a disambiguator: silk/CNG.c and
-        // celt/cwrs.c won't clash, but `find_LPC_FIX.c` lives only in
-        // silk/fixed so it's fine. Use a hash-free suffix derived from the
-        // path components below `vendor/` to keep object names stable.
-        let rel = src.strip_prefix(&vendor).unwrap();
+        // Object filename is the source path's components joined by `__`,
+        // taken relative to either vendor/ or glue/ — keeps names stable
+        // across both source roots without clashes (silk/CNG.c becomes
+        // silk__CNG.o, glue/helpers.c becomes glue__helpers.o).
+        let rel = src
+            .strip_prefix(&vendor)
+            .or_else(|_| src.strip_prefix(&manifest))
+            .expect("source path not under vendor/ or crate manifest");
         let flat = rel
             .components()
             .map(|c| c.as_os_str().to_string_lossy().into_owned())
@@ -137,13 +150,11 @@ fn main() {
         "_opus_encoder_create",
         "_opus_encoder_destroy",
         "_opus_encode",
-        "_opus_encoder_ctl",
         "_opus_decoder_get_size",
         "_opus_decoder_init",
         "_opus_decoder_create",
         "_opus_decoder_destroy",
         "_opus_decode",
-        "_opus_decoder_ctl",
         "_opus_packet_get_nb_samples",
         "_opus_packet_get_nb_frames",
         "_opus_packet_get_samples_per_frame",
@@ -151,6 +162,17 @@ fn main() {
         "_opus_packet_get_bandwidth",
         "_opus_strerror",
         "_opus_get_version_string",
+        // Non-variadic ctl wrappers — JS-callable replacements for
+        // opus_encoder_ctl / opus_decoder_ctl, which can't pass their
+        // variadic argument through emscripten STANDALONE_WASM.
+        "_opus_helpers_encoder_set_bitrate",
+        "_opus_helpers_encoder_set_complexity",
+        "_opus_helpers_encoder_set_signal",
+        "_opus_helpers_encoder_set_inband_fec",
+        "_opus_helpers_encoder_set_packet_loss_perc",
+        "_opus_helpers_encoder_set_vbr",
+        "_opus_helpers_encoder_get_bitrate",
+        "_opus_helpers_decoder_set_gain",
         "_malloc",
         "_free",
     ]

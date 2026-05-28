@@ -16,7 +16,13 @@ The source under [`vendor/`](./vendor) is **unmodified** upstream — see
 
 - [`build.rs`](./build.rs) — drives `emcc` over the C source on wasm32
   targets (no-op on native), selecting the upstream `OPUS_SOURCES` +
-  `CELT_SOURCES` + `SILK_SOURCES` + `SILK_SOURCES_FIXED` file lists.
+  `CELT_SOURCES` + `SILK_SOURCES` + `SILK_SOURCES_FIXED` file lists, plus
+  the small glue layer below.
+- [`glue/helpers.c`](./glue/helpers.c) — thin non-variadic wrappers around
+  `opus_encoder_ctl` / `opus_decoder_ctl`. Emscripten's `STANDALONE_WASM`
+  cannot dispatch variadic arguments from JS (the trailing value silently
+  drops), so any ctl operation called from JS needs a fixed-signature
+  entry point. Same BSD-3-Clause licence as upstream.
 - [`src/lib.rs`](./src/lib.rs) — `wasm_module_bytes()` hands the resulting
   `.wasm` to consumers.
 
