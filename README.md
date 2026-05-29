@@ -11,25 +11,25 @@ compiled to a standalone WebAssembly artifact via
 useful for any Rust + wasm project that needs Opus encode/decode without
 depending on the browser's `WebCodecs.AudioEncoder`.
 
-The source under [`vendor/`](./vendor) is **unmodified** upstream — see
+The source under [`vendor/`](./vendor) is **unmodified** upstream; see
 [`vendor/COPYING`](./vendor/COPYING). This crate adds only:
 
-- [`build.rs`](./build.rs) — drives `emcc` over the C source on wasm32
+- [`build.rs`](./build.rs): drives `emcc` over the C source on wasm32
   targets (no-op on native), selecting the upstream `OPUS_SOURCES` +
   `CELT_SOURCES` + `SILK_SOURCES` + `SILK_SOURCES_FIXED` file lists, plus
   the small glue layer below.
-- [`glue/helpers.c`](./glue/helpers.c) — thin non-variadic wrappers around
+- [`glue/helpers.c`](./glue/helpers.c): thin non-variadic wrappers around
   `opus_encoder_ctl` / `opus_decoder_ctl`. Emscripten's `STANDALONE_WASM`
   cannot dispatch variadic arguments from JS (the trailing value silently
   drops), so any ctl operation called from JS needs a fixed-signature
   entry point. Same BSD-3-Clause licence as upstream.
-- [`src/lib.rs`](./src/lib.rs) — `wasm_module_bytes()` hands the resulting
+- [`src/lib.rs`](./src/lib.rs): `wasm_module_bytes()` hands the resulting
   `.wasm` to consumers.
 
 Built in **FIXED_POINT mode** with **DISABLE_FLOAT_API**: smaller wasm
 (~250 KB vs ~400 KB for float), deterministic across browsers, no
 analysis-based mode switching (the encoder picks SILK/CELT/hybrid from
-the `application` arg — pass `OPUS_APPLICATION_VOIP` for voice). The DNN
+the `application` arg; pass `OPUS_APPLICATION_VOIP` for voice). The DNN
 noise-suppression layer is not compiled.
 
 The crate version tracks upstream libopus releases (currently `1.5.2`,
@@ -55,7 +55,7 @@ let bytes: &'static [u8] = libopus::wasm_module_bytes();
 ## Build requirements
 
 Only does work when the consuming crate targets `wasm32-unknown-unknown`.
-On native (desktop / Android) the build script returns early — native
+On native (desktop / Android) the build script returns early; native
 consumers keep their existing libopus integration (e.g. `audiopus`,
 `opus` crate against system `libopus.so`).
 
@@ -80,7 +80,7 @@ run this build script automatically; the resulting `libopus.wasm`
 
 ## Wire-compat note
 
-Opus is a single standardised codec (RFC 6716) — bytes on the wire are
+Opus is a single standardised codec (RFC 6716); bytes on the wire are
 identical whether the encode side is the system `libopus.so` (desktop /
 Android) or this wasm artifact (browser). FIXED_POINT vs floating-point
 affects encoder-side bit allocation marginally (typical SNR difference
